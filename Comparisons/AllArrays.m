@@ -1,5 +1,5 @@
-%Merged
-% This script combines the changing SLH and testing all M and p. This
+% AllArrays
+% This script combines the changing SLH and testingallMandp. This
 % function loops through M, calculates and loops through p, and then tests
 % all values of L. 
 Mtotest = 32; %maximum nummber of M
@@ -21,7 +21,7 @@ for M = 2:Mtotest
         end
     for L = (M+M*p_actual+1):64  % comment this line to run beampattern only; 
                       % uncomment for prod vs min analysis on # of sensors
-        [Bmin, Bprod, N] = ProductMinBeampatternC(M,p_actual,L,0);
+        [~,~,~,Bmin, Bprod, N,~] = BP_Formation.Nested(M,p_actual,L,0);
 
         if (p_actual+1)*M>=N*M
             disp('Error2')
