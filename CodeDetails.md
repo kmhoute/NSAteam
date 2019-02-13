@@ -24,6 +24,7 @@
     ScatterTest (real) *** not really sure what this did ****
     
   ***add from camille: testingallMandP, changingL_SLH, and merged; from Hossam: genDATA_noise
+  *** can add an extras folder or make an extras class and include the random test functions
 
 
 
