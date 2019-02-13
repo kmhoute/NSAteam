@@ -1,4 +1,4 @@
-function FullArrayAnalysis(data,filter)
+function ULA_Analysis(data,filter)
 %%%% This program uses:   
 %%%%%%%      real    data if data = 0
 %%%%%%% OR simulated data if data = 1
