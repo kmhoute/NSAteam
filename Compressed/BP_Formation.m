@@ -1,12 +1,16 @@
 classdef BP_Formation
+%%%% This class contains functions for forming beampatterns
+%%%%%%% the 'Nested' function forms a NSA beampattern 
+%%%%%%% the 'Linear' function forms a ULA beampattern 
     methods(Static)
-        % creates the Nested Sensor Array Beampattern
         function [u, B1, B2, Bmin, Bprod, N, add1] = Nested(M, p, L, plots)
-        %%% Generates the nested beam pattern
-        %%% plots = 1, a plot is created
-        %%% plots = 0, a plot is not created
-        
-        %%% M and N are the number of sensors in the basic subarrays
+        %%% Nested creates a Nested Sensor Array Beampattern with 
+        %%% M elements in subarray 1, N elements in subarray 2
+        %%% p is the extension factor (applied to subarray 1)
+        %%%       subarray total elements = M + M*p
+        %%% L is the overarching aperture (range) of possible elements
+        %%% set plots = 1 the beampattern plot, plots = 0 for no plot
+            %%% M and N are the number of sensors in the basic subarrays
             M = M;
             N = ceil(L/M);  
         %%% add1 and add2 are the additional sensors in subarray1 and subarray2
@@ -18,25 +22,21 @@ classdef BP_Formation
 
             uDelta = 0.001;
             u = -1:uDelta:1;
-            %%%%The first argument in BeampatternLinearArray is set to 0 so that
-            %%%%that function doesn't plot graphs. The second parameter is the
-            %%%%number of sensors in a subarray. The third parameter is the number
-            %%%%of extra sensors in a subarray for extension. The fourth parameter
-            %%%%is the intersensor spacing in terms of lambda. So, need to specify
-            %%%%0.5 as well.
-            B1 = BP_Formation.Linear(0, M+add1, 0, U1*0.5);
-            B1 = B1/max(abs(B1));
-            B2 = BP_Formation.Linear(0, N+add2, 0, U2*0.5);
-            B2 = B2/max(abs(B2));
-
+            %%%% The first argument in Linear is set to 0 for no plots
+            %%%% The second is the elemens in subarray 1
+            %%%% The third is the number of extra sensors in a subarray
+            %%%% The fourth is the intersensor spacing (lambda=0.5)
+            [B1, ~] = BP_Formation.Linear(0, M+add1, 0, U1*0.5);
+             B1 = B1/max(abs(B1));
+            [B2, ~] = BP_Formation.Linear(0, N+add2, 0, U2*0.5);
+             B2 = B2/max(abs(B2));
 
             Bmin = min(abs([B1;B2]));
             Bmin = 20*log10(abs(Bmin));
 
             Bprod = B1.*conj(B2);
             Bprod = 10*log10(abs(Bprod));
-            
-            
+                     
             if plots == 1
                 f1 = figure;
                 a1 = axes('Parent', f1, 'FontSize', 16, 'FontWeight', 'Bold');%...
@@ -61,8 +61,9 @@ classdef BP_Formation
                 xlim([-1 1]);
                 ylim([-30 0]);
                 title(['add1: ',num2str(add1),' and U2: ',num2str(U2)])
-            elseif (plots ~= 0)|(plots ~= 1)
-                disp('Error; plots must be 0 or 1')
+            elseif plots == 0
+            else
+                error('plots must be 0 or 1')
             end
         end
         
@@ -103,7 +104,7 @@ classdef BP_Formation
                 ylabel('20log|B(u)|, dB', 'FontSize', 16, 'FontWeight', 'Bold');
             %   ylim([-30 0]);
                 xlim([-1 1]);
+            end
         end
-end
     end
 end
