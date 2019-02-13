@@ -2,6 +2,10 @@ classdef BP_Formation
     methods(Static)
         % creates the Nested Sensor Array Beampattern
         function [u, B1, B2, Bmin, Bprod, N, add1] = Nested(M, p, L, plots)
+        %%% Generates the nested beam pattern
+        %%% plots = 1, a plot is created
+        %%% plots = 0, a plot is not created
+        
         %%% M and N are the number of sensors in the basic subarrays
             M = M;
             N = ceil(L/M);  
