@@ -1,10 +1,10 @@
-function NSA_Analysis(data,filter,processor)
+function NSA_Analysis(data,filters,processor)
 %%%% This function uses:   
 %%%%%%%      real    data if data = 0
 %%%%%%% OR simulated data if data = 1
 %%%% AND can apply a filter to the array:
-%%%%%%%      no filter  --> filter = 0
-%%%%%%% OR  with filter --> filter = 1
+%%%%%%%      no filter  --> filters = 0
+%%%%%%% OR  with filter --> filters = 1
 %%%% AND applies a processor to the array:
 %%%%%%%      product --> processor = 1
 %%%%%%% OR   minimum --> processor = 2
@@ -16,14 +16,12 @@ function NSA_Analysis(data,filter,processor)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%% data %%%%%%%%%%%%%%%
-    if (data ~= 0) || (data ~= 1)
-        disp('Error: data = 0 or 1')
-    elseif (data == 0)
+    if (data == 0)
         %%%% load path is dependant on the computer being used
         load 'C:\Users\MaxSlezak\Google Drive\Classes\2018-2019\Senior Design\Measurement_Data\3\138'
         [totalData order]=Rearrange_Data(totalData);
         totalData=totalData(100:40100,3:N);
-    else
+    elseif (data == 1)
         %%%%%%% Some constant parameters
         angle = -34;
         N = 16;%%%%Number of sensors
@@ -44,17 +42,20 @@ function NSA_Analysis(data,filter,processor)
         clear indices t times;
         %%%%To the matrix x above, we need to add white noise
         totalData = x + sqrt(varn/2)*randn(size(x)) + 1i*sqrt(varn/2)*randn(size(x));
+    else
+        disp('Error: data = 0 or 1')
     end
 
 %%%%%%%%%%%%%%%%% filter %%%%%%%%%%%%%%%%%%%
-    if (filter ~= 0) | (filter ~= 1)
-        disp('Error: filter = 0 or 1')
-    elseif (filter == 1)
+    if (filters == 1)
         %Apply a highpass filter to remove noise
         band = designfilt('highpassiir','FilterOrder',50,...
         'PassbandFrequency', 3500, 'PassbandRipple',.2,...
         'SampleRate',44100); %This filter passes frequencies above 4000
         totalData=filter(band,totalData);
+    elseif (filters == 0)
+    else
+        disp('Error: filter = 0 or 1')
     end
 
 %%%%%%%%%%%%%%% processor %%%%%%%%%%%%%%%
