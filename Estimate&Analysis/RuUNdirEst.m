@@ -1,14 +1,14 @@
-classdef RUNdirectionEstimates
+classdef RUNdirEst
 %%%%%For each SNR and number of snapshots, this program calls
 %%%%%"dirEstV2" 1000 times and saves the MSEs
-%%%%% call a function by 'RUNdirectionEstimates.<insertFunction>(<includeAnyInputs>)
+%%%%% call a function by 'RUNdirEst.<insertFunction>(<includeAnyInputs>)
     methods(Static)
         function varyArray(maxM, maxL, ext, reps)
             %%% maxM will most likely be 32 (like absolute max)
             %%% maxL will most likely be 64 (due to physical array)
             %%% ext is the extension factor; 0 -> no ext; 1 -> include ext
             %%% reps will most likely be 1000; run like 3 to just test the code
-            close all; clear; clc;
+            close all;
             tic;
             %%%%Design parameters are
             snr = 10; snapshots = 50;
@@ -24,14 +24,14 @@ classdef RUNdirectionEstimates
                     disp(array(M));%%%%Display: Just to get an idea of where we are in the long simulation
                     p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
                     for ndx = 1:reps
-                        [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirectionEstimates.dirEstV2(M,ceil(L/M),1,M,snr,snapshots);
+                        [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,ceil(L/M),1,M,snr,snapshots);
                     end
                 end
             end
         end    
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
         function varySnapShots(M,N,U1,U2,reps)
-            close all; clear; clc;
+            close all; 
             tic;
             %%%%Design parameters are
             % M = 10; N = 12; U1 = 2; U2 = 3;%%%%%%%%%%%%%%
@@ -44,7 +44,7 @@ classdef RUNdirectionEstimates
                 disp(snapshots(jdx));%%%%Display: Just to get an idea of where we are in the long simulation
                 p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
                 for ndx = 1:reps
-                    [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirectionEstimates.dirEstV2(M,N,U1,U2,snr,snapshots(jdx));
+                    [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,N,U1,U2,snr,snapshots(jdx));
                 end
                 %%%%the following two lines saves MSEs from all 1000 trials in a
                 %%%%file
@@ -56,7 +56,7 @@ classdef RUNdirectionEstimates
         end
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
         function varySNR(M,N,U1,U2,reps)
-            close all;clear;clc;
+            close all;
             tic;
             %%%%Design parameters are
             %%%%%%%%M = 10; N = 12; U1 = 2; U2 = 3; %%%%%%%%%%
@@ -69,7 +69,7 @@ classdef RUNdirectionEstimates
                 disp(snr(jdx));%%%%Display: Just to get an idea of where we are in the long simulation
                 p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
                 for ndx = 1:reps
-                    [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirectionEstimates.dirEstV2(M,N,U1,U2,snr(jdx),snapshots);
+                    [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,N,U1,U2,snr(jdx),snapshots);
                 end
                 %%%%Save all 1000 MSEs for each algorithm in a file
                 b = {'dataForSS50SNRp15Bias'};
@@ -196,7 +196,7 @@ classdef RUNdirectionEstimates
         yprod = yprod/max(abs(yprod));
         ymin = ymin/max(abs(ymin));
         %%%%%Eigen values and vectors for product first
-        Restimate = RUNdirectionEstimates.ifourierTrans(yprod.', 0,max(lags));
+        Restimate = RUNdirEst.ifourierTrans(yprod.', 0,max(lags));
         Rmatrix = toeplitz(Restimate.');
         [eVecd, eVald] = eig(Rmatrix);
         eVald = diag(eVald);
@@ -205,7 +205,7 @@ classdef RUNdirectionEstimates
         noiseBasisd = eVecsortedd(:,length(us)+1:end);
         Rnprod = noiseBasisd*noiseBasisd';
         %%%%%Eigen values and vectors for min next
-        Restimate = RUNdirectionEstimates.ifourierTrans((ymin.').^2,0,max(lags));%%%%Remember to square y for min
+        Restimate = RUNdirEst.ifourierTrans((ymin.').^2,0,max(lags));%%%%Remember to square y for min
         Rmatrix = toeplitz(Restimate.');
         [eVecd, eVald] = eig(Rmatrix);
         eVald = diag(eVald);
