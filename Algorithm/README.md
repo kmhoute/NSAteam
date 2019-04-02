@@ -1,4 +1,4 @@
-To run our ~fancy algorithm~
+To run our fancy algorithm
   1. Since we are basing all of our work off of the 64-long array, we should not need to alter our library of valid arrays, but if you want to use a different library
     -> Run the AllArrays.m file. This will create new B (M, p, L matrix of all verified configurations) and sub2s (the necessary subarray       2 configuration for those M and L values) matricies that will be saved directly into the folder that you are in (the Matlab path           that you are on when you run the script). These matricies should have the same number of rows!!
     
