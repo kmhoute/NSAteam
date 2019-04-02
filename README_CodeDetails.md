@@ -22,7 +22,13 @@
     psl_check analyzes psl through math derivation of the 3/MN pt; 
                 --> need to abjust -13dB to -13.6dB and check/adjust function usage
     ScatterTest (real) *** not really sure what this did ****
-    
+  
+  Estimates&Analysis (4/01/19)
+    RUNdirEst.m is a CLASS (04/01/19); combines directionEstimatesVersion2.m and RUNdirectionEstimates.m
+                            --> includes ways to vary SNR, snapshots, and array parameters
+                            --> could use work to reduce/simplify code
+                              * plotting needs editing on line width and plot size
+                              
   ***add from camille: testingallMandP, changingL_SLH, and merged; from Hossam: genDATA_noise
   *** can add an extras folder or make an extras class and include the random test functions
 
