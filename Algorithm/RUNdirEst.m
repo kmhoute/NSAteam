@@ -3,15 +3,18 @@ classdef RUNdirEst
 %%%%%"dirEstV2" 1000 times and saves the MSEs
 %%%%% call a function by 'RUNdirEst.<insertFunction>(<includeAnyInputs>)
     methods(Static)
-        function varyArray(maxL, elements, reps)
+        function varyArray(maxL, elements, snrin, reps)
             %%% maxL will most likely be 64 (due to physical array)
             %%% elements will most likely be 64 and should not exceed maxL
+            %%% snrin sets the +- range of the snr to test
             %%% reps will most likely be 1000; run like 3 to just test the code
             close all;
             tic;
             %%%%Design parameters are
-            snr = 10; snapshots = 50;
+            snapshots = 50;
             %%%%Now we will run 1000 trials for a fixed number of snapshots and snr, but
+            for snr = -snrin:snrin
+            disp(snr)
             for sensors = 3:elements % loop through sensors used
                 disp('sensors:'); disp(sensors)
                 count = 0;
@@ -31,9 +34,10 @@ classdef RUNdirEst
                     end 
                 end
                 p = sum(ptemp)/count;     m = sum(mtemp)/count;     d = sum(dtemp)/count;     f = sum(ftemp)/count;
-                b = {'dataForSNRp10SS50elements'};
-                save([b{1} num2str(sensors)],'p','m','d','f','snr','snapshots');
+                b = {'dataForSS50elements'};
+                save([b{1} num2str(sensors) 'snr' num2str(snr)],'p','m','d','f','snr','snapshots');
                 disp([mean(p) mean(m) mean(d) mean(f)]);
+            end
             end
             toc;
         end    
