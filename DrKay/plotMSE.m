@@ -1,5 +1,24 @@
+function plotMSE(maxL, elements, snrin)
 %%%%This script finds the average of the MSEs over 1000 trials and
 %%%%plots them
+    numrange = 3:elements
+    snr = -snrin:snrin
+    product0 = zeros(size(numrange),size(snr)); %each column contains the MSE value for one snr with varying number of sensors
+    minimum0 = zeros(size(numrange),size(snr));
+    direct0 = zeros(size(numrange),size(snr));
+    full0 = zeros(size(numrange),size(snr));
+    
+    b = {'dataForSS50elements'};
+    for countsnr = -snrin:snrin
+    for countnum = 3:elements
+        load([b{1} num2str(count) 'snr' num2str(countsnr)]);
+        product0(countnum,countsnr) = p;
+        minimum0(countnum,countsnr) = m;
+        direct0(countnum,countsnr) = d;
+        full0(countnum,countsnr) = f;
+    end
+    end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     snrRange = -15:15;
     product = zeros(size(snrRange));
     minimum = zeros(size(snrRange));
