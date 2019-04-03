@@ -3,31 +3,39 @@ classdef RUNdirEst
 %%%%%"dirEstV2" 1000 times and saves the MSEs
 %%%%% call a function by 'RUNdirEst.<insertFunction>(<includeAnyInputs>)
     methods(Static)
-        function varyArray(maxM, maxL, ext, reps)
-            %%% maxM will most likely be 32 (like absolute max)
+        function varyArray(maxL, elements, reps)
             %%% maxL will most likely be 64 (due to physical array)
-            %%% ext is the extension factor; 0 -> no ext; 1 -> include ext
+            %%% elements will most likely be 64 and should not exceed maxL
             %%% reps will most likely be 1000; run like 3 to just test the code
             close all;
             tic;
             %%%%Design parameters are
             snr = 10; snapshots = 50;
             %%%%Now we will run 1000 trials for a fixed number of snapshots and snr, but
-            %%%%different M and L and p if wanted
-            %%% (This function is probs sooooo wrong so have a good laugh -KH)
-            for L = maxL:-1:3 % loop through aperture (decreasing)
-                if L < (maxM) % maybe L < (maxM+2)
-                    maxM = L-1; % maybe break statement into 2 groups for L
+            for sensors = 3:elements % loop through sensors used
+                disp('sensors:'); disp(sensors)
+                count = 0;
+                ptemp = zeros(1,sensors);    mtemp = zeros(1,sensors);    dtemp = zeros(1,sensors);    ftemp = zeros(1,sensors);
+                for M = 2:(sensors - 1) % loop through subarray1
+                    N = sensors - M + 1; % calculate N (subarray 2 elements)
+                    if (M*(N-1) + 1) > maxL
+                        disp('error: aperture exceeds max aperture allowed')
+                    else
+                        count = count + 1;
+                        disp(M)
+                        p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
+                        for ndx = 1:reps
+                            [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,N,1,M,snr,snapshots);
+                        end
+                        ptemp(count) = mean(p);    mtemp(count) = mean(m);    dtemp(count) = mean(d);    ftemp(count) = mean(f);
+                    end 
                 end
-                for M = 2:maxM % loop through subarray1 (increasing)
-                    % ADD EXTENSION FACTOR STUFF here maybe? (but don't call it p)
-                    disp(array(M));%%%%Display: Just to get an idea of where we are in the long simulation
-                    p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
-                    for ndx = 1:reps
-                        [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,ceil(L/M),1,M,snr,snapshots);
-                    end
-                end
+                p = sum(ptemp)/count;     m = sum(mtemp)/count;     d = sum(dtemp)/count;     f = sum(ftemp)/count;
+                b = {'dataForSNRp10SS50elements'};
+                save([b{1} num2str(sensors)],'p','m','d','f','snr','snapshots');
+                disp([mean(p) mean(m) mean(d) mean(f)]);
             end
+            toc;
         end    
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
         function varySnapShots(M,N,U1,U2,reps)
@@ -283,7 +291,7 @@ classdef RUNdirEst
             legend('Product','Min','Direct','Full ULA','Actual u_1','Actual u_2');
             hold on;
             set(gcf,'WindowState','maximized');    
-                
+            close all;    
     %%%%%The rest of the program finds the peaks in our estimates and
     %%%%%computes the Mean Squared Errors
         MinPeakHeight = -12;
