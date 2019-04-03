@@ -25,7 +25,7 @@ function [pMSE,mMSE,dMSE,fMSE] = directionEstimatesVersion2(M, N, U1, U2, SNRdB,
         ApertureEnd = 63;%%%%The array starts at 0 and ends at 63
         
         %%steering vector
-        v = zeros(ApertureEnd+1,1);
+        v = zeros(ApertureEnd+1,numSources);
         %%%%%The vector will have the data for all sensors
         x = zeros(ApertureEnd+1,SampleSize);
         for idx = 1:numSources
@@ -76,7 +76,7 @@ function [pMSE,mMSE,dMSE,fMSE] = directionEstimatesVersion2(M, N, U1, U2, SNRdB,
         end
         r = zeros(length(coarray),SampleSize);%%%%covariance estimates
         for kdx = 1:SampleSize
-            dataset = xtotal(:,1);
+            dataset = xtotal(:,kdx);
             %%%%The convolution operation can actually be used to find
             %%%%autocorrelation as shown below, for each set of samples
             tempR = conv(dataset.',fliplr(conj(dataset.')));
