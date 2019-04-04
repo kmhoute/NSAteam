@@ -1,0 +1,42 @@
+function plotMSE(maxL, elements, snrin)
+%%%%This script finds the average of the MSEs over 1000 trials and
+%%%%plots them
+%%%%MaxL, elements, and snrin should match the values used when running the RUNdirEst function
+    numrange = 3:elements;
+    snr = -snrin:snrin;
+    product0 = zeros([size(numrange),size(snr)]); %each column contains the MSE value for one snr with varying number of sensors
+    minimum0 = zeros([size(numrange),size(snr)]);
+    direct0 = zeros([size(numrange),size(snr)]);
+    full0 = zeros([size(numrange),size(snr)]);
+    
+    b = {'dataForSS50elements'};
+    for countsnr = 1:2*snrin+1
+    for countnum = 1:size(numrange)
+        load([b{1} num2str(countnum+2) 'snr' num2str(countsnr-2*snrin+1)]);
+        product0(countnum,countsnr) = p;
+        minimum0(countnum,countsnr) = m;
+        direct0(countnum,countsnr) = d;
+        full0(countnum,countsnr) = f;
+    end
+    end
+    for countsnr = 1:2*snrin+1
+        figure;
+        plot(numrange,product0(countsnr),'LineStyle', '-', 'LineWidth', 2, ...
+        'Marker','square','Color', [0.6 0 0.6]);
+        hold on;
+        plot(numrange, minimum0(countsnr), 'LineStyle', '-.', 'LineWidth', 2, ...
+        'Marker','diamond','Color', [0 0.6 0]);
+        hold on;
+        plot(numrange, direct0(countsnr), 'LineStyle', '--', 'LineWidth', 2, ...
+        'Marker','square','Color', [0 0 0.6]);
+        hold on;
+        plot(numrange, full(countsnr), 'LineStyle', ':', 'LineWidth', 2, ...
+        'Marker','v','Color', [0 0 0]);      
+        hold on;
+        xlabel('Number of Sensors Used', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend('Product','Minimum','Direct','Full');
+        title(['SNR:' num2str(countsnr-snrin-1)])
+        xlim([3, elements]);
+        hold off;
+    end
