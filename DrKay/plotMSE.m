@@ -18,6 +18,26 @@ function plotMSE(maxL, elements, snrin)
         full0(countnum,countsnr) = f;
     end
     end
+    for countsnr = -snrin:snrin
+        plot(numrange,product0(countsnr),'LineStyle', '-', 'LineWidth', 2, ...
+        'Marker','square','Color', [0.6 0 0.6]);
+        hold on;
+        plot(numrange, minimum0(countsnr), 'LineStyle', '-.', 'LineWidth', 2, ...
+        'Marker','diamond','Color', [0 0.6 0]);
+        hold on;
+        plot(numrange, direct0(countsnr), 'LineStyle', '--', 'LineWidth', 2, ...
+        'Marker','square','Color', [0 0 0.6]);
+        hold on;
+        plot(numrange, full(countsnr), 'LineStyle', ':', 'LineWidth', 2, ...
+        'Marker','v','Color', [0 0 0]);      
+        hold on;
+        xlabel('Number of Sensors Used', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend('Product','Minimum','Direct','Full');
+        xlim([3 numrange]);
+        hold off;
+    end
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     snrRange = -15:15;
     product = zeros(size(snrRange));
