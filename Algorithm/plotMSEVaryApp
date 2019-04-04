@@ -1,0 +1,118 @@
+function plotMSEVaryApp(maxL, elements, snrin)
+%%%%This script finds the average of the MSEs over 1000 trials and
+%%%%plots them
+%%%%maxL, elements, and snrin should match the parameters used in RUNdirEst
+    close all;    
+    snr0 = -snrin:snrin;
+    product0 = zeros(length(snr0),maxL); %each column contains the MSE value for one snr with varying number of sensors
+    minimum0 = zeros(length(snr0),maxL);
+    direct0 = zeros(length(snr0),maxL);
+    full0 = zeros(length(snr0),maxL);
+    b = {'dataForSS50elements'};
+    for snr = -snrin:snrin
+        maxcount=0;
+                for M = 2:(elements - 1) % loop through subarray1
+                    N = elements - M + 1; % calculate N (subarray 2 elements)
+                    if (M*(N-1) + 1) > maxL
+                        %disp('error: aperture exceeds max aperture allowed')
+                    else
+                        maxcount=maxcount+1;
+                        b = {'dataForSS50app'};
+                        load([b{1} num2str(M*(N-1) + 1) 'snr' num2str(snr)]);
+                        product0(snr+snrin+1,M*(N-1) + 1)=p;
+                        minimum0(snr+snrin+1,M*(N-1) + 1)=m;
+                        direct0(snr+snrin+1,M*(N-1) + 1)=d;
+                        full0(snr+snrin+1,M*(N-1) + 1)=f;
+                    end 
+                end
+    end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%plot product
+snrlim = [-snrin,snrin];
+figure;
+count=0;
+name = {''};
+     for M = 2:(elements - 1) % loop through subarray1
+            N = elements - M + 1; % calculate N (subarray 2 elements)
+            if (M*(N-1) + 1) > maxL
+            else
+                count = count +1;
+                name{count}=num2str(M*(N-1) + 1);
+                plot(snr0,product0(:,M*(N-1) + 1), '-s', 'LineWidth', 2,...
+                    'Color',[0,count/maxcount,count/maxcount]);
+                hold on;
+            end
+     end
+        xlabel('SNR', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend(name);
+        title('Prod:Fixed sensors MSE vs SNR for varried L', 'FontSize', 16, 'FontWeight', 'Bold')
+        xlim(snrlim);
+        ylim([0,2]);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Plot min results    
+figure;     
+count=0;
+name = {''};
+for M = 2:(elements - 1) % loop through subarray1
+            N = elements - M + 1; % calculate N (subarray 2 elements)
+            if (M*(N-1) + 1) > maxL
+            else
+                count = count +1;
+                name{count}=num2str(M*(N-1) + 1);
+                plot(snr0, minimum0(:,M*(N-1) + 1)', '-.dg', 'LineWidth', 2,...
+                    'Color',[0,count/maxcount,count/maxcount]);
+                hold on;
+            end
+        end
+        xlabel('SNR', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend(name);
+        title('Min:Fixed sensors MSE vs SNR for varried L', 'FontSize', 16, 'FontWeight', 'Bold')
+        xlim(snrlim);
+        ylim([0,.3]);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Plot direct
+figure;
+count=0;
+name = {''};
+        for M = 2:(elements - 1) % loop through subarray1
+            N = elements - M + 1; % calculate N (subarray 2 elements)
+            if (M*(N-1) + 1) > maxL
+            else
+                count = count +1;
+                name{count}=num2str(M*(N-1) + 1);
+                plot(snr0, direct0(:,M*(N-1) + 1)', '--ob', 'LineWidth', 2,...
+                    'Color',[0,count/maxcount,count/maxcount]);
+                hold on;
+            end
+        end
+        xlabel('SNR', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend(name);
+        title('Direct:Fixed sensors MSE vs SNR for varried L', 'FontSize', 16, 'FontWeight', 'Bold')
+        xlim(snrlim);
+        ylim([0,.3]);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%plot full
+figure;
+count=0;
+name = {''};
+        for M = 2:(elements - 1) % loop through subarray1
+            N = elements - M + 1; % calculate N (subarray 2 elements)
+            if (M*(N-1) + 1) > maxL
+            else
+                count = count +1;
+                name{count}=num2str(M*(N-1) + 1);
+                plot(snr0, full0(:,M*(N-1) + 1)', ':vk', 'LineWidth', 2,...
+                    'Color',[0,count/maxcount,count/maxcount]);
+                hold on;
+            end
+        end
+        xlabel('SNR', 'FontSize', 16, 'FontWeight', 'Bold');
+        ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
+        legend(name);
+        title('Full:Fixed sensors MSE vs SNR for varried L', 'FontSize', 16, 'FontWeight', 'Bold')
+        xlim(snrlim);
+        ylim([0,.3]);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
