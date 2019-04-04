@@ -6,77 +6,104 @@ load('B.mat');
 f = find(diff([0,sensors,0]==1)); %index of every change
 x = f(1:2:end-1);  % Start indices of 1s
 y = f(2:2:end)-x;  % Consecutive 1s counts
-[M_max,~] = max(y); %Index in x of the location of the max consecutive line of 1s
-% position = x(i); If i need this, replace ~ with i
-if M_max <2
+[M_maxO,d] = max(y); %Index in x of the location of the max consecutive line of 1s
+
+if M_maxO <2
     error('M too small. This array cannot function as an NSA')
 end
-Mdecmax = M_max-2;
 
 first = x(1); 
-last = find(sensors,1,'last');
-Lorig = last-first+1;
+last = find(sensors,1,'last'); %Because sensors is 1s and 0s, this will find the last 1
+L_orig = last-first+1;
 sensors = sensors(first:last); %trims any outside zeros
 
-plots = 0; %will use later to turn on the plots
-working = 0; %will determine whether we are using a verified config (in B matrix)
-match = 0; %
-for k=0:(Lorig-7)
-    L=Lorig-k;
-    lookhere = find(cell2mat(sub2s(:,2))==L);
-    while isempty(lookhere)==0 %there is a valid config of that L 
-        for i = lookhere(1):lookhere(end)
-            sub2s_check = sub2s{i,1};
-            
-            for m=1:(Mdecmax) % 2 is the lowest M we will allow
-                if (B(i,1)==M_max) && (B(i,2)==0) 
-                    M = M_max;
-                    p = 0;
-                    plots = 1; %Shows the plot
-                    match = 1;
-                elseif (B(i,2)~=0) && (mod(M_max,(1+B(i,2)))==0) 
-                    M = floor(M_max/(1+B(i,2)));
-                    p = B(i,2);
-                    plots = 1; 
-                    match = 1;
-                else 
-                    M_max = M_max-m;
-                end
-                
+badcase = 0;
+match = 0; %Determines whether the configuration matches a known one
+while true
+    for L = L_orig:-1:7
+        disp('Im checking a new aperture')
+        lookhere = find(cell2mat(sub2s(:,2))==L);
+        while isempty(lookhere)==0 %there is a valid config of that L 
+            for i = lookhere(1):lookhere(end)
+                sub2s_check = sub2s{i,1};          
+                for M_max = M_maxO:-1:2 % 2 is the lowest M we will allow
+                    disp('Im checking a new M')
+                    while M_max==(B(i,1)*(1+B(i,2)))%M*(1+p)
+                    disp('Im testing different p values')    
+                    PF = zeros(1,length(sub2s_check)); %pass/fail matrix
+                        for j = 1:length(sub2s_check)
+                           if sensors(j)==0 && sub2s_check(j)==1
+                           PF(j)=1; %A sensor failure in a critical location
+                           % sum(PF)=0 if it passes sensor by sensor
+                           end       
+                        end
+                        if sum(PF)==0
+                            match = 1;
+                            M = B(i,1);
+                            p = B(i,2);
+                            l = B(i,3); %aperture
+                            
+                            break % out of M_max==B(i,1)*(1+B(i,2))%M*(1+p) 
+                        end                   
+                    end
                 if match == 1
+                  % out of for M_max = M_maxO:-1:2 
                     break
                 end
+                end
+            if match == 1
+              % out of i = lookhere(1):lookhere(end)
+                break
             end
-                       
-            PF = zeros(1,length(sub2s_check)); %pass/fail matrix
-           for j = 1:length(sub2s_check)
-               if sensors(j)==0 && sub2s_check(j)==1
-               PF(j)=1; %A sensor failure in a critical location
-               end       
-           end
-
-           if sum(PF)==0 && match==1
-                NSA_Analysis(1,0,2,plots,M,p,L);
-                %data: 1=simulated 0=real
-                %filters: 1=applies a filter 0=does not apply a filter
-                %processor: 1=product 2=minimum
-                %plots: 1:plots the DOA and freq 0:does not plot
-                %L
-                disp(M); disp(p); disp(L); disp(i);
-                
-            elseif (plots == 0) || (match == 0)
-               %plot the result knowing that it will not be a passing
-               %config. Assume no extension
-               plots=1;
-               NSA_Analysis(1,0,2,plots,M_max,0,L);
-               msgbox('Warning: This configuration is NOT guaranteed')
-            end     
-%            elseif L==7 && sum(PF)>0
-%                msgbox('No Configurations were found')
-        break
+            end
+        if match == 1
+          % out of isempty(lookhere)==0
+            break
         end
+        end        
+    if match == 1
+    % out of L = L_orig:-1:7
         break
-    end 
+    end
+    end
+   
+if match == 1
+    % out of while true -> end function
     break
+end             
+%%%%%%%%%%%%%%%%%%%%%%%%% NOT AS GOOD AS A ULA %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for L = L_orig:-1:7
+        for M = 2:M_maxO %M
+        sub2 = zeros(1,L);
+        sub2(1:M:end) = 1; % Required sub 2 with a certain M and L
+            if mod(M_maxO,M)==0
+                p = M_maxO/M-1;
+                PF = zeros(1,length(sub2)); %pass/fail matrix
+                for j = 1:length(sub2s)
+                   if sensors(j)==0 && sub2(j)==1
+                   PF(j)=1; %A sensor failure in a critical location
+                   % sum(PF)=0 if it passes sensor by sensor
+                   end       
+                end
+            if sum(PF)==0
+                break %out to L=L_orig:-1:7
+            end
+            end
+        end    
+    end
+if badcase==1
+    break % out of while true loop
+end 
+break %out of while true loop to disp('Array is not able to be analyzed as an NSA')
+end %end of while true loop
+
+%%%% Plot!!
+if match == 1
+    NSA_Analysis(1,0,2,1,M,p,l);
+elseif badcase == 1
+    NSA_Analysis(1,0,2,1,M,p,L);
+    msgbox('Warning: This configuration is NOT guaranteed','','warn')
+else
+    disp('Array is not able to be analyzed as an NSA')
 end
 end
