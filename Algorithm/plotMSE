@@ -4,14 +4,14 @@ function plotMSE(maxL, elements, snrin)
 %%%%maxL, elements, and snrin should match the parameters used in RUNdirEst
     numrange = 3:elements;
     snr = -snrin:snrin;
-    product0 = zeros([size(numrange),size(snr)]); %each column contains the MSE value for one snr with varying number of sensors
-    minimum0 = zeros([size(numrange),size(snr)]);
-    direct0 = zeros([size(numrange),size(snr)]);
-    full0 = zeros([size(numrange),size(snr)]);
+    product0 = zeros(length(numrange),length(snr)); %each column contains the MSE value for one snr with varying number of sensors
+    minimum0 = zeros(length(numrange),length(snr));
+    direct0 = zeros(length(numrange),length(snr));
+    full0 = zeros(length(numrange),length(snr));
     
     b = {'dataForSS50elements'};
     for countsnr = 1:2*snrin+1
-    for countnum = 1:size(numrange)
+    for countnum = 1:length(numrange)
         load([b{1} num2str(countnum+2) 'snr' num2str(countsnr-2*snrin+2)]);
         product0(countnum,countsnr) = p;
         minimum0(countnum,countsnr) = m;
@@ -21,22 +21,17 @@ function plotMSE(maxL, elements, snrin)
     end
     for countsnr = 1:2*snrin+1
         figure;
-        plot(numrange,product0(countsnr),'LineStyle', '-', 'LineWidth', 2, ...
-        'Marker','square','Color', [0.6 0 0.6]);
+        plot(numrange,[product0(:,countsnr)], '-sr', 'LineWidth', 2);
         hold on;
-        plot(numrange, minimum0(countsnr), 'LineStyle', '-.', 'LineWidth', 2, ...
-        'Marker','diamond','Color', [0 0.6 0]);
+        plot(numrange, minimum0(:,countsnr)', '-.dg', 'LineWidth', 2);
         hold on;
-        plot(numrange, direct0(countsnr), 'LineStyle', '--', 'LineWidth', 2, ...
-        'Marker','square','Color', [0 0 0.6]);
+        plot(numrange, direct0(:,countsnr)', '--ob', 'LineWidth', 2);
         hold on;
-        plot(numrange, full(countsnr), 'LineStyle', ':', 'LineWidth', 2, ...
-        'Marker','v','Color', [0 0 0]);      
+        plot(numrange, full0(:,countsnr)', ':vk', 'LineWidth', 2);      
         hold on;
         xlabel('Number of Sensors Used', 'FontSize', 16, 'FontWeight', 'Bold');
         ylabel('MSE', 'FontSize', 16, 'FontWeight', 'Bold');
         legend('Product','Minimum','Direct','Full');
         title(['SNR:' num2str(countsnr-snrin-1)])
         xlim([3, elements]);
-        hold off;
     end
