@@ -40,7 +40,44 @@ classdef RUNdirEst
             end
             end
             toc;
-        end    
+        end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function varyArrayFixedElements(maxL,elements,snrin,reps)
+            %%% maxL will most likely be 64 (due to physical array)
+            %%% elements sets the number of elements on in each array
+            %%%     will most likely be 64 and should not exceed maxL
+            %%% snrin sets the +- range of the snr to test
+            %%% reps will most likely be 1000; run like 3 to just test the code
+            close all;
+            tic;
+                        %%%%Design parameters are
+            snapshots = 50;
+            %%%%Now we will run 1000 trials for a fixed number of snapshots and snr, but
+            for snr = -snrin:snrin
+            disp(snr)
+            for sensors = elements % loop through sensors used
+                disp('sensors:'); disp(sensors)
+                ptemp = zeros(1,sensors);    mtemp = zeros(1,sensors);    dtemp = zeros(1,sensors);    ftemp = zeros(1,sensors);
+                for M = 2:(sensors - 1) % loop through subarray1
+                    N = sensors - M + 1; % calculate N (subarray 2 elements)
+                    if (M*(N-1) + 1) > maxL
+                        disp('error: aperture exceeds max aperture allowed')
+                    else
+                        disp('M');disp(M)
+                        p = zeros(1,reps);    m = zeros(1,reps);    d = zeros(1,reps);    f = zeros(1,reps);
+                        for ndx = 1:reps
+                            [p(ndx), m(ndx), d(ndx), f(ndx)] = RUNdirEst.dirEstV2(M,N,1,M,snr,snapshots);
+                        end
+                        p = mean(p);    m = mean(m);    d = mean(d);    f = mean(f);
+                        b = {'dataForSS50app'};
+                        save([b{1} num2str(M*(N-1) + 1) 'snr' num2str(snr)],'p','m','d','f','snr','snapshots');
+                    end 
+                end
+                disp([mean(p) mean(m) mean(d) mean(f)]);
+            end
+            end
+            toc;
+        end
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
         function varySnapShots(M,N,U1,U2,reps)
             close all; 
