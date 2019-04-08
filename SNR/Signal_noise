@@ -1,0 +1,84 @@
+%% Prameters 
+
+    angle = 170;                                                             % Angle of the signal 
+    
+    number_of_sensor = 64;                                                  % Number of sensor   
+    
+    shape_of_window_kaiser = 0.5;                                             % Shape of the kaiser window  
+
+    freq = 44169 ;                                                             % Signal frequency 
+    
+    noise_freq = freq;                                                       % Noise frequency 
+    
+    Fs = freq*2;                                                            % Sampled rate
+    
+    sample_rate = 44100;
+    
+    sample_per_second = 1/Fs;                                               % Time samples                                    
+    
+    time = (0:sample_rate-1)*sample_per_second;                             % Time
+    
+    location = 0:number_of_sensor-1;                                        % location of the sensor
+
+    [indices, t] = meshgrid(location,time);                                 % Creating Indices and t 
+
+    tt = rand(size(t,1),size(t,2));                                         % Time for noise
+    
+%% Creating Signals
+
+    signal = 2*exp(1j*(2*pi*freq*t-pi*cosd(angle)*indices));                  % The Signal 
+
+    noise = sin(2*pi*noise_freq*t).*((complex(rand(size(signal,1),size(signal,2)) + 1i*rand(size(signal,1),size(signal,2)))));
+                                                                            % Noise signal 
+    NOISE = cos(2*pi*noise_freq*3.25*t);
+    
+    NOISE = NOISE.*conj(noise);
+    
+    signal_noise = signal+NOISE;                                            % signal and noise 
+    
+    totalData = signal_noise;
+
+%% Actual Data
+
+%% PSD analysis 
+
+    w = kaiser(length(totalData),pi*shape_of_window_kaiser);                % Kaiser windowing
+
+    rbw = enbw(w,Fs);                                                       % Returns the two-sided equivalent noise bandwidth, bw, in Hz.
+
+    for i = 1:size(totalData,2)                                             % for loop to calculate each microphone PSD by it self
+        
+        [ sxx(:,i),F(:,i) ] = periodogram(totalData(:,i),w,length(totalData),Fs,'Power');   
+                                                                            % sxx = the PSD and F = frequencies specified in the vector.
+        SNR(:,i) = snr(sxx(:,i),F(:,i),rbw,'power');                        % Singal to nouse ration for each Sensor
+        
+    end
+
+    sxxx = mean(sxx,2)                                                      % the avrage PSD for all of the sensor
+    
+    
+    ff = mean(F,2)                                                          % the avaege frequencies specified for all of the sensor
+            
+    SNR_check = snr(sxxx,ff,rbw,'power')                                    % singal to noise ratio and the PSD OF the signal 
+    
+    snr(sxxx,ff,rbw,'power')                                                % Display the figure 
+    
+    sensor_on = zeros(size(totalData,1),size(totalData,2));           % Creat a matrix of the sensor vs the total data point  
+    
+for j = 1:size(totalData,2)                                              % For loop to check if the resulten SNR is higher than the SNR...
+                                                                            % of the individule sensor 
+    if SNR_check < SNR(:,j)                                                 % If it is higher 
+        
+        sensor_on(:,j) = 1;                                                 % Then place 0 
+        
+    else                                                                    % If it is not 
+            
+        sensor_on(:,j) = 0;                                                 % Then place 1
+        
+    end
+   
+end
+
+good_sensor_data = totalData.*sensor_on;                                 % actual good data
+
+sensors = sensor_on(1,:);
