@@ -498,7 +498,7 @@ name = {''};
             if (M*(N-1) + 1) > maxL
             else
                 count = count +1;
-                name{count}=num2str(M*(N-1) + 1);
+                name{count}=[num2str(M*(N-1) + 1) ' ' num2str(M)];
                 plot(snr0,product0(:,M*(N-1) + 1), '-s', 'LineWidth', 2,...
                     'Color',[0,count/maxcount,count/maxcount]);
                 hold on;
@@ -520,7 +520,7 @@ for M = 2:(elements - 1) % loop through subarray1
             if (M*(N-1) + 1) > maxL
             else
                 count = count +1;
-                name{count}=num2str(M*(N-1) + 1);
+                name{count}=[num2str(M*(N-1) + 1) ' ' num2str(M)];
                 plot(snr0, minimum0(:,M*(N-1) + 1)', '-.dg', 'LineWidth', 2,...
                     'Color',[0,count/maxcount,count/maxcount]);
                 hold on;
@@ -542,7 +542,7 @@ name = {''};
             if (M*(N-1) + 1) > maxL
             else
                 count = count +1;
-                name{count}=num2str(M*(N-1) + 1);
+                name{count}=num2str[num2str(M*(N-1) + 1) ' ' num2str(M)];
                 plot(snr0, direct0(:,M*(N-1) + 1)', '--ob', 'LineWidth', 2,...
                     'Color',[0,count/maxcount,count/maxcount]);
                 hold on;
@@ -564,7 +564,7 @@ name = {''};
             if (M*(N-1) + 1) > maxL
             else
                 count = count +1;
-                name{count}=num2str(M*(N-1) + 1);
+                name{count}=[num2str(M*(N-1) + 1) ' ' num2str(M)];
                 plot(snr0, full0(:,M*(N-1) + 1)', ':vk', 'LineWidth', 2,...
                     'Color',[0,count/maxcount,count/maxcount]);
                 hold on;
