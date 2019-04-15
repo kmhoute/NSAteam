@@ -520,7 +520,7 @@ for M = 2:(elements - 1) % loop through subarray1
             if (M*(N-1) + 1) > maxL
             else
                 count = count +1;
-                name{count}=[num2str(M) ' ' num2str(M)];
+                name{count}=[num2str(M*(N-1) + 1) ' ' num2str(M)];
                 plot(snr0, minimum0(:,M)', '-.dg', 'LineWidth', 2,...
                     'Color',[0,count/maxcount,count/maxcount]);
                 hold on;
