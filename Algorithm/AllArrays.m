@@ -20,10 +20,9 @@ tic;
                 %disp(num2str(L))
                 max_p=max_p-1; % decrease p
             end
-            
+            peak_compare = zeros((max_p+1), 3); % matrix for psl height check
             for p = 0:max_p % loop through extension factor (indices are p+1 to start at 1 not 0)
-                peak_compare = zeros((max_p+1), 2); % matrix for psl height check
-                [u,~,~,Bmin, ~, N,~] = BP_Formation.Nested(M,p,L,0); % gennerates BP for the case
+                [~,~,~,Bmin, ~, N,~] = BP_Formation.Nested(M,p,L,0); % gennerates BP for the case
                 
                 % locates first null of the minimum processed B
                 Bmin_MinPos = islocalmin(Bmin(floor((length(Bmin)/2)):end)); % logic matrix
@@ -32,6 +31,7 @@ tic;
                 
                 peak_compare((p+1),1) = p; % saves the extension factor
                 peak_compare((p+1),2) = max(Bmin(locmin_1_min:end)); % saves the max value which is the PSL height
+                peak_compare((p+1),3) = N;
             end % ends ext factor (p) loop  
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
@@ -39,7 +39,7 @@ tic;
             no_ofindexes = find(peak_compare(:,2)<=-13); % saves indices of successful configs
             Configs_good(1:length(no_ofindexes),1) = M; 
             Configs_good(1:length(no_ofindexes),2) = peak_compare(no_ofindexes,1);
-            Configs_good(1:length(no_ofindexes),3) = L;
+            Configs_good(1:length(no_ofindexes),3) = M*(peak_compare(no_ofindexes,3)-1)+1;
             Configs_good(1:length(no_ofindexes),4) = M*((peak_compare(no_ofindexes,1))+1); % stores totalM length
             
             % concatenates the cases stored above to the previously tested success cases
@@ -48,7 +48,7 @@ tic;
             no_ofindexes_bad = find(peak_compare(:,2)>-13);
             Configs_bad(1:length(no_ofindexes_bad),1) = M;
             Configs_bad(1:length(no_ofindexes_bad),2) = peak_compare(no_ofindexes_bad,1);
-            Configs_bad(1:length(no_ofindexes_bad),3) = L;
+            Configs_bad(1:length(no_ofindexes_bad),3) = M*(peak_compare(no_ofindexes_bad,3)-1)+1;;
             Configs_bad(1:length(no_ofindexes_bad),4) = M*((peak_compare(no_ofindexes_bad,1))+1);
             
             finalConfigs_bad = cat(1,finalConfigs_bad(:,:),Configs_bad(:,:));
