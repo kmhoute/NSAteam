@@ -1,0 +1,11 @@
+Okay, so this should be all that we need to run the final algorithm
+The results from creating the library of configurations (finalConfigs_good, finalConfigs_bad, sub2s, sub2s_bad) are included here, but if you run AllArrays, these files will be created in the MATLAB folder in which you are currently working
+
+MainAlgorithm has been changed a little bit so that it can be accessed in Final Algorithm. Might be a good idea to combine NSA_Analysis and MainAlgorithm into a class
+
+Finally, run FinalAlgorithm(real_or_simulated,varargin)
+
+real_or_simulated = 1 for real data. When real_or_simulated is set to 1, you do not need to enter any other inputs. The code will then direct you to select a data file from your files and it will rerder the file since the physical sensors need to be reordered in the code.
+
+real_or_simulated = 0 for simulated data. When real_or_simulated is set to 0, you must enter a varargin. This can be either a set of M,p,L values or a matrix of 1/0 to represent a theoretical array. Enter this in brackets as the only varargin input. 
+(ex. FinalAlgorithm(0,[1 0 1 0 1]))
